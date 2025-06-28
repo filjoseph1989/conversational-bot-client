@@ -1,6 +1,4 @@
-
 import { useState } from 'react';
-import './App.css';
 
 function App() {
   const [persona, setPersona] = useState('');
@@ -13,40 +11,42 @@ function App() {
   };
 
   return (
-    <div className="app-container" style={{ maxWidth: 480, margin: '40px auto', padding: 24, borderRadius: 12, boxShadow: '0 2px 16px #0001', background: '#fff' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: 24 }}>Persona Prompt Builder</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <label style={{ fontWeight: 500 }}>
-          Persona:
-          <input
-            type="text"
-            value={persona}
-            onChange={e => setPersona(e.target.value)}
-            placeholder="e.g. Friendly AI assistant"
-            style={{ width: '100%', marginTop: 4, padding: 8, borderRadius: 6, border: '1px solid #ccc' }}
-            required
-          />
-        </label>
-        <label style={{ fontWeight: 500 }}>
-          Prompt:
-          <textarea
-            value={prompt}
-            onChange={e => setPrompt(e.target.value)}
-            placeholder="Enter your prompt here..."
-            rows={4}
-            style={{ width: '100%', marginTop: 4, padding: 8, borderRadius: 6, border: '1px solid #ccc', resize: 'vertical' }}
-            required
-          />
-        </label>
-        <button type="submit" style={{ padding: '10px 0', borderRadius: 6, background: '#646cff', color: '#fff', fontWeight: 600, border: 'none', fontSize: 16, cursor: 'pointer' }}>
+    <div className="max-w-[480px] mx-auto my-10 p-6 bg-white rounded-xl shadow-[0_2px_16px_#0001]">
+      <h2 className="text-center text-2xl font-bold mb-6">Persona Prompt Builder</h2>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <label className="font-medium" htmlFor="persona"> Persona: </label>
+        <input
+          id='persona'
+          type="text"
+          value={persona}
+          onChange={e => setPersona(e.target.value)}
+          placeholder="e.g. Friendly AI assistant"
+          className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+          required />
+        <label className="font-medium" htmlFor='prompt'> Prompt: </label>
+        <textarea
+          id='prompt'
+          value={prompt}
+          onChange={e => setPrompt(e.target.value)}
+          placeholder="Enter your prompt here..."
+          rows={4}
+          className="w-full mt-1 p-2 border border-gray-300 rounded-md resize-y"
+          required />
+        <button
+          type="submit"
+          className="py-2.5 rounded-md bg-[#646cff] text-white font-semibold text-base cursor-pointer border-none hover:bg-[#535bf2] transition-colors">
           Submit
         </button>
       </form>
       {submitted && (
-        <div style={{ marginTop: 32, background: '#f6f8fa', borderRadius: 8, padding: 16 }}>
-          <h3>Submitted</h3>
-          <div><strong>Persona:</strong> {submitted.persona}</div>
-          <div><strong>Prompt:</strong> {submitted.prompt}</div>
+        <div className="mt-8 bg-gray-50 rounded-lg p-4 space-y-2">
+          <h3 className="text-lg font-semibold">Submitted</h3>
+          <div>
+            <strong className="font-semibold">Persona:</strong> {submitted.persona}
+          </div>
+          <div>
+            <strong className="font-semibold">Prompt:</strong> {submitted.prompt}
+          </div>
         </div>
       )}
     </div>
