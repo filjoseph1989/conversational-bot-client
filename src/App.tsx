@@ -4,10 +4,35 @@ function App() {
   const [persona, setPersona] = useState('');
   const [prompt, setPrompt] = useState('');
   const [submitted, setSubmitted] = useState<{ persona: string; prompt: string } | null>(null);
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted({ persona, prompt });
+    setStatusMessage(null);
+
+    try {
+      const response = await fetch('http://localhost:3000/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ persona, prompt }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      setSubmitted({ persona, prompt });
+      setStatusMessage({
+        type: 'success',
+        message: 'Submitted successfully!'
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+      setStatusMessage({ type: 'error', message: `Submission failed: ${errorMessage}` });
+      console.error('Error submitting form:', error);
+    }
   };
 
   return (
@@ -38,6 +63,12 @@ function App() {
           Submit
         </button>
       </form>
+      {statusMessage && (
+        <div className={`mt-4 p-3 rounded-md text-center ${statusMessage.type === 'success'
+            ? 'bg-green-100 text-green-800'
+            : 'bg-red-100 text-red-800'
+          }`}>{statusMessage.message}</div>
+      )}
       {submitted && (
         <div className="mt-8 bg-gray-50 rounded-lg p-4 space-y-2">
           <h3 className="text-lg font-semibold">Submitted</h3>
