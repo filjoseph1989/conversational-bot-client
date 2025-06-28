@@ -1,14 +1,40 @@
 import { useState } from 'react';
+import Persona from './components/Persona';
+import Prompt from './components/Prompt';
+
+type Step = 'CREATE_PERSONA' | 'PERSONA_CREATED' | 'CHATTING';
+
+interface Message {
+  id: number;
+  sender: 'user' | 'bot';
+  text: string;
+  audioUrl?: string;
+}
 
 function App() {
+  const [step, setStep] = useState<Step>('CREATE_PERSONA');
   const [persona, setPersona] = useState('');
   const [prompt, setPrompt] = useState('');
-  const [submitted, setSubmitted] = useState<{ persona: string; prompt: string } | null>(null);
-  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePromptSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (prompt.trim() === '' || isLoading) return;
+
     setStatusMessage(null);
+
+    const userMessage: Message = {
+      id: Date.now(),
+      sender: 'user',
+      text: prompt,
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    const currentPrompt = prompt;
+    setPrompt(''); // Clear prompt immediately for better UX
+    setIsLoading(true);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/generate`, {
@@ -16,69 +42,127 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ persona, prompt }),
+        body: JSON.stringify({ persona, prompt: currentPrompt }),
       });
 
       if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+        const errorData = await response.json().catch(() => ({ message: `Request failed with status ${response.status}` }));
+        throw new Error(errorData.message || `Request failed with status ${response.status}`);
       }
 
-      setSubmitted({ persona, prompt });
-      setStatusMessage({
-        type: 'success',
-        message: 'Submitted successfully!'
-      });
+      const data = await response.json(); // { text: string, audioContent: string }
+
+      if (!data.text || !data.audioContent) {
+        throw new Error('Invalid response from server.');
+      }
+
+      const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
+
+      const botMessage: Message = {
+        id: Date.now() + 1, // ensure unique key
+        sender: 'bot',
+        text: data.text,
+        audioUrl: audioUrl,
+      };
+
+      setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-      setStatusMessage({ type: 'error', message: `Submission failed: ${errorMessage}` });
+      setStatusMessage({ type: 'error', message: `Failed to get response: ${errorMessage}` });
       console.error('Error submitting form:', error);
+      setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleCreateBot = () => {
+    if (persona.trim() === '') {
+      setStatusMessage({ type: 'error', message: 'Persona cannot be empty.' });
+      return;
+    }
+    setStatusMessage({ type: 'success', message: 'Bot successfully created!' });
+    setStep('PERSONA_CREATED');
+  };
+
+  const handleStartChatting = () => {
+    setStep('CHATTING');
+    setStatusMessage(null); // Clear the "Bot created" message
   };
 
   return (
     <div className="max-w-[480px] mx-auto my-10 p-6 bg-white rounded-xl shadow-[0_2px_16px_#0001]">
-      <h2 className="text-center text-2xl font-bold mb-6">Persona Prompt Builder</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <label className="font-medium" htmlFor="persona"> Persona: </label>
-        <input
-          id='persona'
-          type="text"
-          value={persona}
-          onChange={e => setPersona(e.target.value)}
-          placeholder="e.g. Friendly AI assistant"
-          className="w-full mt-1 p-2 border border-gray-300 rounded-md"
-          required />
-        <label className="font-medium" htmlFor='prompt'> Prompt: </label>
-        <textarea
-          id='prompt'
-          value={prompt}
-          onChange={e => setPrompt(e.target.value)}
-          placeholder="Enter your prompt here..."
-          rows={4}
-          className="w-full mt-1 p-2 border border-gray-300 rounded-md resize-y"
-          required />
-        <button
-          type="submit"
-          className="py-2.5 rounded-md bg-[#646cff] text-white font-semibold text-base cursor-pointer border-none hover:bg-[#535bf2] transition-colors">
-          Submit
-        </button>
-      </form>
+      <h2 className="text-center text-2xl font-bold mb-6">
+        {step === 'CREATE_PERSONA' ? 'Create Your Bot' : 'Chat with your Bot'}
+      </h2>
+
+      {step === 'CREATE_PERSONA' && (
+        <div className="flex flex-col gap-4">
+          <Persona value={persona} onChange={e => setPersona(e.target.value)} />
+          <button
+            onClick={handleCreateBot}
+            disabled={!persona.trim()}
+            className="py-2.5 rounded-md bg-[#646cff] text-white font-semibold text-base cursor-pointer border-none hover:bg-[#535bf2] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+            Create Bot
+          </button>
+        </div>
+      )}
+
+      {step === 'PERSONA_CREATED' && (
+        <div className="text-center">
+          <button
+            onClick={handleStartChatting}
+            className="py-2.5 px-6 rounded-md bg-[#646cff] text-white font-semibold text-base cursor-pointer border-none hover:bg-[#535bf2] transition-colors">
+            Start Chatting
+          </button>
+        </div>
+      )}
+
+      {step === 'CHATTING' && (
+        <>
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <p><strong className="font-semibold">Bot Persona:</strong> {persona}</p>
+          </div>
+
+          <div className="space-y-4 mb-4 h-80 overflow-y-auto p-3 border rounded-md bg-gray-50 flex flex-col">
+            {messages.map((message) => (
+              <div key={message.id} className={`flex items-end ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] p-3 rounded-lg ${message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
+                  <p className="text-sm">{message.text}</p>
+                  {message.audioUrl && (
+                    <audio controls src={message.audioUrl} className="mt-2 w-full h-8">
+                      Your browser does not support the audio element.
+                    </audio>
+                  )}
+                </div>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="max-w-[80%] p-3 rounded-lg bg-gray-200 text-black">
+                  <p className="text-sm italic">Bot is thinking...</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <form onSubmit={handlePromptSubmit} className="flex flex-col gap-4">
+            <Prompt value={prompt} onChange={e => setPrompt(e.target.value)} />
+            <button
+              type="submit"
+              disabled={isLoading || !prompt.trim()}
+              className="py-2.5 rounded-md bg-[#646cff] text-white font-semibold text-base cursor-pointer border-none hover:bg-[#535bf2] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+              {isLoading ? 'Sending...' : 'Send Message'}
+            </button>
+          </form>
+        </>
+      )}
+
       {statusMessage && (
         <div className={`mt-4 p-3 rounded-md text-center ${statusMessage.type === 'success'
-            ? 'bg-green-100 text-green-800'
-            : 'bg-red-100 text-red-800'
-          }`}>{statusMessage.message}</div>
-      )}
-      {submitted && (
-        <div className="mt-8 bg-gray-50 rounded-lg p-4 space-y-2">
-          <h3 className="text-lg font-semibold">Submitted</h3>
-          <div>
-            <strong className="font-semibold">Persona:</strong> {submitted.persona}
-          </div>
-          <div>
-            <strong className="font-semibold">Prompt:</strong> {submitted.prompt}
-          </div>
-        </div>
+          ? 'bg-green-100 text-green-800'
+          : 'bg-red-100 text-red-800'
+        }`}>{statusMessage.message}</div>
       )}
     </div>
   );
