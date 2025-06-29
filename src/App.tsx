@@ -3,6 +3,7 @@ import Persona from './components/Persona';
 import ChatView from './components/ChatView';
 import type { Step, Message, Bot } from './types/index';
 import { capitalize, truncateWords } from './utils/stringUtils';
+import BotList from './components/BotList';
 
 function App() {
   const [showBotList, setShowBotList] = useState(true);
@@ -173,30 +174,7 @@ function App() {
       </h2>
 
       {showBotList && bots.length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">All Bots</h3>
-          <ul className="space-y-1">
-            {bots.map((bot) => (
-              <li key={bot.createdAt} className="flex items-center gap-2 text-sm justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold">{capitalize(bot.name)}</span>
-                  <span
-                    className="text-gray-600 cursor-help cursor-pointer"
-                    title={bot.persona}>
-                    - {truncateWords(bot.persona, 3)}
-                  </span>
-                  <span className="text-gray-400">({new Date(bot.createdAt).toLocaleString()})</span>
-                </div>
-                <button
-                  onClick={() => handleStartChatting(bot.persona, bot.name, bot.createdAt)}
-                  className="p-1 rounded-full text-white hover:bg-[#e3e5ff] transition-colors cursor-pointer flex items-center justify-center"
-                  title="Start Chatting" >
-                  <img src="src/assets/chat-svgrepo-com.svg" alt="Chat" className="w-5 h-5" />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <BotList bots={bots} onStartChat={handleStartChatting} />
       )}
 
       {step === 'CREATE_PERSONA' && (
