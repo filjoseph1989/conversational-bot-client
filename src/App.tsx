@@ -18,7 +18,7 @@ function App() {
     setStatusMessage(null);
 
     const userMessage: Message = {
-      id: Date.now(),
+      id: crypto.randomUUID(),
       sender: 'user',
       text: prompt,
     };
@@ -51,7 +51,7 @@ function App() {
       const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
 
       const botMessage: Message = {
-        id: Date.now() + 1, // ensure unique key
+        id: crypto.randomUUID(),
         sender: 'bot',
         text: data.text,
         audioUrl: audioUrl,
