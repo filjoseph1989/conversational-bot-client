@@ -1,17 +1,7 @@
 import { useState } from 'react';
 import Persona from './components/Persona';
 import ChatView from './components/ChatView';
-
-// Define the steps for the multi-step form
-type Step = 'CREATE_PERSONA' | 'PERSONA_CREATED' | 'CHATTING';
-
-// Define the message structure
-export interface Message {
-  id: number;
-  sender: 'user' | 'bot';
-  text: string;
-  audioUrl?: string;
-}
+import type { Step, Message } from './types/index';
 
 function App() {
   const [step, setStep] = useState<Step>('CREATE_PERSONA');
