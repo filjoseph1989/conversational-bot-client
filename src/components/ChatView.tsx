@@ -2,6 +2,7 @@ import React from 'react';
 import type { Message } from '../types/index';
 import { Link } from 'react-router-dom';
 import { truncateWords } from '../utils/stringUtils';
+import Prompt from './Prompt';
 
 interface ChatViewProps {
   botName: string;
@@ -61,15 +62,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         </div>
 
         <form onSubmit={onPromptSubmit} className="w-full flex flex-col gap-4">
-          <label className="font-medium" htmlFor='prompt'> Prompt: </label>
-          <textarea
-            id='prompt'
-            value={prompt}
-            onChange={onPromptChange}
-            placeholder="Enter your prompt here..."
-            rows={4}
-            className="w-full mt-1 p-2 border border-gray-300 rounded-md resize-y"
-            required />
+          <Prompt value={prompt} onChange={onPromptChange} />
           <button
             type="submit"
             disabled={isLoading || !prompt.trim()}
