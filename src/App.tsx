@@ -4,6 +4,7 @@ import type { Step, Message, Bot } from './types/index';
 import BotListPage from './pages/BotListPage';
 import CreateBotPage from './pages/CreateBotPage';
 import ChatBotPage from './pages/ChatBotPage';
+import StatusMessage from './components/StatusMessage';
 
 function App() {
   const [step, setStep] = useState<Step>('CREATE_PERSONA');
@@ -207,10 +208,9 @@ function App() {
       )}
 
       {statusMessage && (
-        <div className={`mt-4 p-3 rounded-md text-center ${statusMessage.type === 'success'
-          ? 'bg-green-100 text-green-800'
-          : 'bg-red-100 text-red-800'
-        }`}>{statusMessage.message}</div>
+        <StatusMessage
+          type={statusMessage.type}
+          message={statusMessage.message} />
       )}
     </div>
   );
