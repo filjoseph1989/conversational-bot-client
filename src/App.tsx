@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import Persona from './components/Persona';
-import ChatView from './components/ChatView';
+
 import type { Step, Message, Bot } from './types/index';
-import { capitalize, truncateWords } from './utils/stringUtils';
-import BotList from './components/BotList';
+import BotListPage from './pages/BotListPage';
+import CreateBotPage from './pages/CreateBotPage';
+import ChatBotPage from './pages/ChatBotPage';
 
 function App() {
   const [showBotList, setShowBotList] = useState(true);
@@ -169,28 +169,15 @@ function App() {
 
   return (
     <div className="max-w-[480px] mx-auto my-10 p-6 bg-white rounded-xl shadow-[0_2px_16px_#0001]">
-      <h2 className="text-center text-2xl font-bold mb-6">
-        {step === 'CREATE_PERSONA' ? 'Create Your Bot' : 'Chat with your Bot'}
-      </h2>
-
-      {showBotList && bots.length > 0 && (
-        <BotList bots={bots} onStartChat={handleStartChatting} />
-      )}
-
       {step === 'CREATE_PERSONA' && (
-        <div className="flex flex-col gap-4">
-          <Persona
-            name={name}
-            onNameChange={e => setName(e.target.value)}
-            value={persona}
-            onChange={e => setPersona(e.target.value)} />
-          <button
-            onClick={handleCreateBot}
-            disabled={!name.trim() || !persona.trim()}
-            className="py-2.5 rounded-md bg-[#646cff] text-white font-semibold text-base cursor-pointer border-none hover:bg-[#535bf2] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
-            Create Bot
-          </button>
-        </div>
+        <CreateBotPage
+          name={name}
+          persona={persona}
+          onNameChange={e => setName(e.target.value)}
+          onPersonaChange={e => setPersona(e.target.value)}
+          onCreateBot={handleCreateBot}
+          isCreateDisabled={!name.trim() || !persona.trim()}
+        />
       )}
 
       {step === 'PERSONA_CREATED' && (
@@ -200,25 +187,26 @@ function App() {
             className="py-2.5 px-6 rounded-md bg-white text-[#646cff] font-semibold text-base cursor-pointer border border-[#646cff] hover:bg-blue-50 transition-colors">
             Create New Bot
           </button>
+          <BotListPage
+            bots={bots}
+            onStartChat={handleStartChatting}
+            onCreateNewBot={handleCreateNewBot}
+          />
         </div>
       )}
 
       {step === 'CHATTING' && selectedBotId !== null && (
-        <>
-          <button
-            onClick={() => setShowBotList((prev) => !prev)}
-            className="mb-4 px-4 py-2 rounded bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors">
-            {showBotList ? 'Hide Bot List' : 'Show Bot List'}
-          </button>
-          <ChatView
-            persona={persona}
-            messages={bots.find(b => b.createdAt === selectedBotId)?.messages || []}
-            isLoading={isLoading}
-            prompt={prompt}
-            onPromptChange={e => setPrompt(e.target.value)}
-            onPromptSubmit={handlePromptSubmit}
-            onCreateNewBot={handleCreateNewBot} />
-        </>
+        <ChatBotPage
+          persona={persona}
+          messages={bots.find(b => b.createdAt === selectedBotId)?.messages || []}
+          isLoading={isLoading}
+          prompt={prompt}
+          onPromptChange={e => setPrompt(e.target.value)}
+          onPromptSubmit={handlePromptSubmit}
+          onCreateNewBot={handleCreateNewBot}
+          onToggleBotList={() => setShowBotList((prev) => !prev)}
+          showBotList={showBotList}
+        />
       )}
 
       {statusMessage && (
