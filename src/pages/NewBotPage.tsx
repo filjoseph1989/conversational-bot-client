@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import type { AppContextType } from '../App';
 import type { Bot, StatusMessage } from '../types/index';
 import Persona from '../components/Persona';
+import StatusMessageComponent from '../components/StatusMessage';
 
 function NewBotPage() {
   const navigate = useNavigate();
@@ -39,12 +40,7 @@ function NewBotPage() {
       <h2 className="text-center text-2xl font-bold mb-6">Create a New Bot</h2>
 
       {statusMessage && (
-        <div
-          className={`p-3 mb-4 rounded-md text-sm ${
-            statusMessage.type === 'error' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-          }`} >
-          {statusMessage.message}
-        </div>
+        <StatusMessageComponent {...statusMessage} />
       )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">

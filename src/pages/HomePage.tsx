@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useOutletContext } from 'react-router-dom';
 import BotList from '../components/BotList';
 
+import StatusMessageComponent from '../components/StatusMessage';
 import type { AppContextType } from '../App';
 import type { StatusMessage } from '../types';
 
@@ -41,12 +42,7 @@ function HomePage() {
           <div className="w-full flex flex-col gap-4">
             <h2 className="text-center text-2xl font-bold mb-6">Your Bots</h2>
             {statusMessage && (
-              <div
-                className={`p-3 mb-4 rounded-md text-sm ${
-                  statusMessage.type === 'error' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                }`} >
-                {statusMessage.message}
-              </div>
+              <StatusMessageComponent {...statusMessage} />
             )}
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-2">All Bots</h3>
