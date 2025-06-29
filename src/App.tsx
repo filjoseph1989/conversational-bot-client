@@ -158,8 +158,9 @@ function App() {
                 </div>
                 <button
                   onClick={() => handleStartChatting(bot.persona, bot.name)}
-                  className="px-3 py-1 rounded bg-[#646cff] text-white text-xs font-semibold hover:bg-[#535bf2] transition-colors cursor-pointer">
-                  Start Chatting
+                  className="p-1 rounded-full text-white hover:bg-[#e3e5ff] transition-colors cursor-pointer flex items-center justify-center"
+                  title="Start Chatting" >
+                  <img src="src/assets/chat-svgrepo-com.svg" alt="Chat" className="w-5 h-5" />
                 </button>
               </li>
             ))}
