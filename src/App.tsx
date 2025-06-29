@@ -6,7 +6,6 @@ import CreateBotPage from './pages/CreateBotPage';
 import ChatBotPage from './pages/ChatBotPage';
 
 function App() {
-  const [showBotList, setShowBotList] = useState(true);
   const [step, setStep] = useState<Step>('CREATE_PERSONA');
   const [name, setName] = useState('');
   const [persona, setPersona] = useState('');
@@ -204,9 +203,7 @@ function App() {
           onPromptChange={e => setPrompt(e.target.value)}
           onPromptSubmit={handlePromptSubmit}
           onCreateNewBot={handleCreateNewBot}
-          onToggleBotList={() => setShowBotList((prev) => !prev)}
-          showBotList={showBotList}
-        />
+          onToggleBotList={() => setStep('PERSONA_CREATED')} />
       )}
 
       {statusMessage && (

@@ -11,7 +11,6 @@ interface ChatBotPageProps {
   onPromptSubmit: (e: React.FormEvent) => void;
   onCreateNewBot: () => void;
   onToggleBotList: () => void;
-  showBotList: boolean;
 }
 
 const ChatBotPage: React.FC<ChatBotPageProps> = ({
@@ -23,7 +22,6 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({
   onPromptSubmit,
   onCreateNewBot,
   onToggleBotList,
-  showBotList,
 }) => (
   <>
     <button
