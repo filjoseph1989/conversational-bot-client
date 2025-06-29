@@ -1,6 +1,6 @@
 import React from 'react';
 import Prompt from './Prompt';
-import { Message } from '../App';
+import type { Message } from '../types/index';
 
 interface ChatViewProps {
   persona: string;
@@ -9,6 +9,7 @@ interface ChatViewProps {
   prompt: string;
   onPromptChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onPromptSubmit: (e: React.FormEvent) => void;
+  onCreateNewBot: () => void;
 }
 
 const ChatView: React.FC<ChatViewProps> = ({
@@ -18,11 +19,17 @@ const ChatView: React.FC<ChatViewProps> = ({
   prompt,
   onPromptChange,
   onPromptSubmit,
+  onCreateNewBot,
 }) => {
   return (
     <>
-      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md flex justify-between items-center">
         <p><strong className="font-semibold">Bot Persona:</strong> {persona}</p>
+        <button
+          onClick={onCreateNewBot}
+          className="py-1 px-3 rounded-md bg-white text-blue-600 border border-blue-300 hover:bg-blue-100 transition-colors text-sm font-semibold">
+          New Bot
+        </button>
       </div>
 
       <div className="space-y-4 mb-4 h-80 overflow-y-auto p-3 border rounded-md bg-gray-50 flex flex-col">

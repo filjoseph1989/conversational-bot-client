@@ -101,6 +101,19 @@ function App() {
     setStatusMessage(null); // Clear the "Bot created" message
   };
 
+  /**
+   * handleCreateNewBot - Resets the application state to allow creating a new bot.
+   * @returns void
+   */
+  const handleCreateNewBot = () => {
+    setStep('CREATE_PERSONA');
+    setPersona('');
+    setMessages([]);
+    setPrompt('');
+    setIsLoading(false);
+    setStatusMessage(null);
+  };
+
   return (
     <div className="max-w-[480px] mx-auto my-10 p-6 bg-white rounded-xl shadow-[0_2px_16px_#0001]">
       <h2 className="text-center text-2xl font-bold mb-6">
@@ -136,7 +149,8 @@ function App() {
           isLoading={isLoading}
           prompt={prompt}
           onPromptChange={e => setPrompt(e.target.value)}
-          onPromptSubmit={handlePromptSubmit} />
+          onPromptSubmit={handlePromptSubmit}
+          onCreateNewBot={handleCreateNewBot} />
       )}
 
       {statusMessage && (
