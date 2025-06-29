@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Persona from './components/Persona';
 import ChatView from './components/ChatView';
 import type { Step, Message, Bot } from './types/index';
+import { capitalize } from './utils/stringUtils';
 
 function App() {
   const [step, setStep] = useState<Step>('CREATE_PERSONA');
@@ -148,7 +149,7 @@ function App() {
             {bots.map((bot) => (
               <li key={bot.createdAt} className="flex items-center gap-2 text-sm justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold">{bot.name.charAt(0).toUpperCase() + bot.name.slice(1)}</span>
+                  <span className="font-bold">{capitalize(bot.name)}</span>
                   <span
                     className="text-gray-600 cursor-help cursor-pointer"
                     title={bot.persona}>
