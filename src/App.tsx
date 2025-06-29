@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
+import { useLocalStorageState } from './hooks/useLocalStorageState';
 import type { Bot } from './types';
 
 export type AppContextType = {
@@ -8,19 +8,7 @@ export type AppContextType = {
 };
 
 function App() {
-  const [bots, setBots] = useState<Bot[]>(() => {
-    try {
-      const saved = localStorage.getItem('bots');
-      return saved ? JSON.parse(saved) : [];
-    } catch (error) {
-      console.error('Error parsing bots from localStorage:', error);
-      return [];
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem('bots', JSON.stringify(bots));
-  }, [bots]);
+  const [bots, setBots] = useLocalStorageState<Bot[]>('bots', []);
 
   return (
     <>
