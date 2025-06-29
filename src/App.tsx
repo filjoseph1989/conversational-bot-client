@@ -9,8 +9,13 @@ export type AppContextType = {
 
 function App() {
   const [bots, setBots] = useState<Bot[]>(() => {
-    const saved = localStorage.getItem('bots');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('bots');
+      return saved ? JSON.parse(saved) : [];
+    } catch (error) {
+      console.error('Error parsing bots from localStorage:', error);
+      return [];
+    }
   });
 
   useEffect(() => {
