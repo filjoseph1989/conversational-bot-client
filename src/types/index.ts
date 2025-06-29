@@ -8,3 +8,9 @@ export interface Message {
   text: string;
   audioUrl?: string;
 }
+
+// Add Bot interface
+export interface Bot {
+  persona: string;
+  createdAt: number;
+}

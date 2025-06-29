@@ -53,7 +53,9 @@ const ChatView: React.FC<ChatViewProps> = ({
       </div>
 
       <form onSubmit={onPromptSubmit} className="flex flex-col gap-4">
-        <Prompt value={prompt} onChange={onPromptChange} />
+        <Prompt
+          value={prompt}
+          onChange={onPromptChange} />
         <button type="submit" disabled={isLoading || !prompt.trim()} className="py-2.5 rounded-md bg-[#646cff] text-white font-semibold text-base cursor-pointer border-none hover:bg-[#535bf2] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
           {isLoading ? 'Sending...' : 'Send Message'}
         </button>
