@@ -9,26 +9,18 @@ function App() {
   const [name, setName] = useState('');
   const [persona, setPersona] = useState('');
   const [prompt, setPrompt] = useState('');
-  const [messages, setMessages] = useState<Message[]>(() => {
-    const saved = localStorage.getItem('chatMessages');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [selectedBotId, setSelectedBotId] = useState<number | null>(null);
   const [bots, setBots] = useState<Bot[]>(() => {
     const saved = localStorage.getItem('bots');
     return saved ? JSON.parse(saved) : [];
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  // Persist bots to localStorage
+  // Persist bots (with messages) to localStorage
   useEffect(() => {
     localStorage.setItem('bots', JSON.stringify(bots));
   }, [bots]);
-
-  // Persist chat messages to localStorage
-  useEffect(() => {
-    localStorage.setItem('chatMessages', JSON.stringify(messages));
-  }, [messages]);
 
   // Automatically hide statusMessage after 3 seconds
   useEffect(() => {
@@ -48,7 +40,7 @@ function App() {
    */
   const handlePromptSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (prompt.trim() === '' || isLoading) return;
+    if (prompt.trim() === '' || isLoading || selectedBotId === null) return;
 
     setStatusMessage(null);
 
@@ -58,10 +50,15 @@ function App() {
       text: prompt,
     };
 
-    setMessages(prev => [...prev, userMessage]);
     const currentPrompt = prompt;
     setPrompt(''); // Clear prompt immediately for better UX
     setIsLoading(true);
+
+    setBots(prevBots => prevBots.map(bot =>
+      bot.createdAt === selectedBotId
+        ? { ...bot, messages: [...(bot.messages || []), userMessage] }
+        : bot
+    ));
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/generate`, {
@@ -92,12 +89,20 @@ function App() {
         audioUrl: audioUrl,
       };
 
-      setMessages(prev => [...prev, botMessage]);
+      setBots(prevBots => prevBots.map(bot =>
+        bot.createdAt === selectedBotId
+          ? { ...bot, messages: [...(bot.messages || []), botMessage] }
+          : bot
+      ));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
       setStatusMessage({ type: 'error', message: `Failed to get response: ${errorMessage}` });
       console.error('Error submitting form:', error);
-      setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+      setBots(prevBots => prevBots.map(bot =>
+        bot.createdAt === selectedBotId
+          ? { ...bot, messages: (bot.messages || []).filter(m => m.id !== userMessage.id) }
+          : bot
+      ));
       setPrompt(currentPrompt);
     } finally {
       setIsLoading(false);
@@ -117,11 +122,14 @@ function App() {
       setStatusMessage({ type: 'error', message: 'Persona cannot be empty.' });
       return;
     }
-    // Add the new bot to the bots list
-    setBots(prev => [
-      ...prev,
-      { name: name.trim(), persona: persona.trim(), createdAt: Date.now() }
-    ]);
+    const newBot: Bot = {
+      name: name.trim(),
+      persona: persona.trim(),
+      createdAt: Date.now(),
+      messages: [],
+    };
+    setBots(prev => [...prev, newBot]);
+    setSelectedBotId(newBot.createdAt);
     setStatusMessage({ type: 'success', message: 'Bot successfully created!' });
     setStep('PERSONA_CREATED');
   };
@@ -130,9 +138,10 @@ function App() {
    * handleStartChatting - Transitions to the chatting step.
    * @returns void
    */
-  const handleStartChatting = (persona: string, name: string): void => {
+  const handleStartChatting = (persona: string, name: string, createdAt?: number): void => {
     setPersona(persona);
     setName(name);
+    if (createdAt) setSelectedBotId(createdAt);
     setStep('CHATTING');
     setStatusMessage(null); // Clear the "Bot created" message
   };
@@ -145,7 +154,12 @@ function App() {
     setStep('CREATE_PERSONA');
     setName('');
     setPersona('');
-    setMessages([]);
+    setSelectedBotId(null);
+    setPrompt('');
+    setStep('CREATE_PERSONA');
+    setName('');
+    setPersona('');
+    setSelectedBotId(null);
     setPrompt('');
     setIsLoading(false);
     setStatusMessage(null);
@@ -174,7 +188,7 @@ function App() {
                   <span className="text-gray-400">({new Date(bot.createdAt).toLocaleString()})</span>
                 </div>
                 <button
-                  onClick={() => handleStartChatting(bot.persona, bot.name)}
+                  onClick={() => handleStartChatting(bot.persona, bot.name, bot.createdAt)}
                   className="p-1 rounded-full text-white hover:bg-[#e3e5ff] transition-colors cursor-pointer flex items-center justify-center"
                   title="Start Chatting" >
                   <img src="src/assets/chat-svgrepo-com.svg" alt="Chat" className="w-5 h-5" />
@@ -211,10 +225,10 @@ function App() {
         </div>
       )}
 
-      {step === 'CHATTING' && (
+      {step === 'CHATTING' && selectedBotId !== null && (
         <ChatView
           persona={persona}
-          messages={messages}
+          messages={bots.find(b => b.createdAt === selectedBotId)?.messages || []}
           isLoading={isLoading}
           prompt={prompt}
           onPromptChange={e => setPrompt(e.target.value)}

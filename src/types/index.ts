@@ -14,4 +14,5 @@ export interface Bot {
   name: string;
   persona: string;
   createdAt: number;
+  messages: Message[];
 }
