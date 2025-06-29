@@ -9,10 +9,26 @@ function App() {
   const [name, setName] = useState('');
   const [persona, setPersona] = useState('');
   const [prompt, setPrompt] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const saved = localStorage.getItem('chatMessages');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [bots, setBots] = useState<Bot[]>([]);
+  const [bots, setBots] = useState<Bot[]>(() => {
+    const saved = localStorage.getItem('bots');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Persist bots to localStorage
+  useEffect(() => {
+    localStorage.setItem('bots', JSON.stringify(bots));
+  }, [bots]);
+
+  // Persist chat messages to localStorage
+  useEffect(() => {
+    localStorage.setItem('chatMessages', JSON.stringify(messages));
+  }, [messages]);
 
   // Automatically hide statusMessage after 3 seconds
   useEffect(() => {
