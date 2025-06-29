@@ -20,7 +20,7 @@ This project is a simple yet powerful bot builder that leverages Google's Gemini
 
 Here's a glimpse of the bot creation interface:
 
-![Bot Creation Screenshot](screenshot/Screenshot_29-6-2025_124342_localhost.jpeg)
+![Bot Creation Screenshot](screenshot/Screenshot_29-6-2025_215741_localhost.jpeg)
 
 
 ## Technologies Used

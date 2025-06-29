@@ -42,12 +42,17 @@ const ChatView: React.FC<ChatViewProps> = ({
         </div>
 
         <div ref={chatContainerRef} className="w-full space-y-4 mb-4 h-80 overflow-y-auto p-3 border rounded-md bg-gray-50 flex flex-col">
-          {messages.map((message) => (
+          {messages.map((message, index) => (
             <div key={message.id} className={`flex items-end ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[80%] p-3 rounded-lg ${message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
                 <p className="text-sm">{message.text}</p>
                 {message.audioUrl && (
-                  <audio controls autoPlay src={message.audioUrl} className="mt-2 w-full h-8" />
+                  <audio
+                    controls
+                    autoPlay={index === messages.length - 1}
+                    src={message.audioUrl}
+                    className="mt-2 w-full h-8"
+                  />
                 )}
               </div>
             </div>
