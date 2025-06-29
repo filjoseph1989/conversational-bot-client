@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Persona from './components/Persona';
 import ChatView from './components/ChatView';
 import type { Step, Message, Bot } from './types/index';
-import { capitalize } from './utils/stringUtils';
+import { capitalize, truncateWords } from './utils/stringUtils';
 
 function App() {
   const [step, setStep] = useState<Step>('CREATE_PERSONA');
@@ -153,7 +153,7 @@ function App() {
                   <span
                     className="text-gray-600 cursor-help cursor-pointer"
                     title={bot.persona}>
-                    - {bot.persona.split(' ').slice(0, 3).join(' ')}{bot.persona.split(' ').length > 3 ? '...' : ''}
+                    - {truncateWords(bot.persona, 3)}
                   </span>
                   <span className="text-gray-400">({new Date(bot.createdAt).toLocaleString()})</span>
                 </div>
