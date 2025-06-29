@@ -5,6 +5,7 @@ import type { Step, Message, Bot } from './types/index';
 import { capitalize, truncateWords } from './utils/stringUtils';
 
 function App() {
+  const [showBotList, setShowBotList] = useState(true);
   const [step, setStep] = useState<Step>('CREATE_PERSONA');
   const [name, setName] = useState('');
   const [persona, setPersona] = useState('');
@@ -171,8 +172,7 @@ function App() {
         {step === 'CREATE_PERSONA' ? 'Create Your Bot' : 'Chat with your Bot'}
       </h2>
 
-      {/* List of all created bots */}
-      {bots.length > 0 && (
+      {showBotList && bots.length > 0 && (
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-2">All Bots</h3>
           <ul className="space-y-1">
@@ -226,14 +226,21 @@ function App() {
       )}
 
       {step === 'CHATTING' && selectedBotId !== null && (
-        <ChatView
-          persona={persona}
-          messages={bots.find(b => b.createdAt === selectedBotId)?.messages || []}
-          isLoading={isLoading}
-          prompt={prompt}
-          onPromptChange={e => setPrompt(e.target.value)}
-          onPromptSubmit={handlePromptSubmit}
-          onCreateNewBot={handleCreateNewBot} />
+        <>
+          <button
+            onClick={() => setShowBotList((prev) => !prev)}
+            className="mb-4 px-4 py-2 rounded bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors">
+            {showBotList ? 'Hide Bot List' : 'Show Bot List'}
+          </button>
+          <ChatView
+            persona={persona}
+            messages={bots.find(b => b.createdAt === selectedBotId)?.messages || []}
+            isLoading={isLoading}
+            prompt={prompt}
+            onPromptChange={e => setPrompt(e.target.value)}
+            onPromptSubmit={handlePromptSubmit}
+            onCreateNewBot={handleCreateNewBot} />
+        </>
       )}
 
       {statusMessage && (
