@@ -149,7 +149,11 @@ function App() {
               <li key={bot.createdAt} className="flex items-center gap-2 text-sm justify-between">
                 <div className="flex items-center gap-2">
                   <span className="font-bold">{bot.name}</span>
-                  <span className="text-gray-600">- {bot.persona.split(' ').slice(0, 3).join(' ')}{bot.persona.split(' ').length > 3 ? '...' : ''}</span>
+                  <span
+                    className="text-gray-600 cursor-help cursor-pointer"
+                    title={bot.persona}>
+                    - {bot.persona.split(' ').slice(0, 3).join(' ')}{bot.persona.split(' ').length > 3 ? '...' : ''}
+                  </span>
                   <span className="text-gray-400">({new Date(bot.createdAt).toLocaleString()})</span>
                 </div>
                 <button
