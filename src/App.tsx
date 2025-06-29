@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import Persona from './components/Persona';
-import Prompt from './components/Prompt';
+import ChatView from './components/ChatView';
 
+// Define the steps for the multi-step form
 type Step = 'CREATE_PERSONA' | 'PERSONA_CREATED' | 'CHATTING';
 
-interface Message {
+// Define the message structure
+export interface Message {
   id: number;
   sender: 'user' | 'bot';
   text: string;
@@ -71,11 +73,16 @@ function App() {
       setStatusMessage({ type: 'error', message: `Failed to get response: ${errorMessage}` });
       console.error('Error submitting form:', error);
       setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+      setPrompt(currentPrompt);
     } finally {
       setIsLoading(false);
     }
   };
 
+  /**
+   * handleCreateBot - Handles the creation of the bot persona.
+   * @returns void
+   */
   const handleCreateBot = () => {
     if (persona.trim() === '') {
       setStatusMessage({ type: 'error', message: 'Persona cannot be empty.' });
@@ -85,6 +92,10 @@ function App() {
     setStep('PERSONA_CREATED');
   };
 
+  /**
+   * handleStartChatting - Transitions to the chatting step.
+   * @returns void
+   */
   const handleStartChatting = () => {
     setStep('CHATTING');
     setStatusMessage(null); // Clear the "Bot created" message
@@ -119,43 +130,13 @@ function App() {
       )}
 
       {step === 'CHATTING' && (
-        <>
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-            <p><strong className="font-semibold">Bot Persona:</strong> {persona}</p>
-          </div>
-
-          <div className="space-y-4 mb-4 h-80 overflow-y-auto p-3 border rounded-md bg-gray-50 flex flex-col">
-            {messages.map((message) => (
-              <div key={message.id} className={`flex items-end ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] p-3 rounded-lg ${message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
-                  <p className="text-sm">{message.text}</p>
-                  {message.audioUrl && (
-                    <audio controls src={message.audioUrl} className="mt-2 w-full h-8">
-                      Your browser does not support the audio element.
-                    </audio>
-                  )}
-                </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="max-w-[80%] p-3 rounded-lg bg-gray-200 text-black">
-                  <p className="text-sm italic">Bot is thinking...</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <form onSubmit={handlePromptSubmit} className="flex flex-col gap-4">
-            <Prompt value={prompt} onChange={e => setPrompt(e.target.value)} />
-            <button
-              type="submit"
-              disabled={isLoading || !prompt.trim()}
-              className="py-2.5 rounded-md bg-[#646cff] text-white font-semibold text-base cursor-pointer border-none hover:bg-[#535bf2] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
-              {isLoading ? 'Sending...' : 'Send Message'}
-            </button>
-          </form>
-        </>
+        <ChatView
+          persona={persona}
+          messages={messages}
+          isLoading={isLoading}
+          prompt={prompt}
+          onPromptChange={e => setPrompt(e.target.value)}
+          onPromptSubmit={handlePromptSubmit} />
       )}
 
       {statusMessage && (
