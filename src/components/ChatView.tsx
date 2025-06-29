@@ -24,7 +24,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   return (
     <>
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md flex justify-between items-center">
-        <p><strong className="font-semibold">Bot Persona:</strong> {persona}</p>
+        <p><strong className="font-semibold">Bot role:</strong> {persona}</p>
         <button
           onClick={onCreateNewBot}
           className="py-1 px-3 rounded-md bg-white text-blue-600 border border-blue-300 hover:bg-blue-100 transition-colors text-sm font-semibold cursor-pointer hover:shadow-sm">

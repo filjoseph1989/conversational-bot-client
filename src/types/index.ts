@@ -11,6 +11,7 @@ export interface Message {
 
 // Add Bot interface
 export interface Bot {
+  name: string;
   persona: string;
   createdAt: number;
 }

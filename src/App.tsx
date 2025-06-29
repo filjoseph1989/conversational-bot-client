@@ -5,6 +5,7 @@ import type { Step, Message, Bot } from './types/index';
 
 function App() {
   const [step, setStep] = useState<Step>('CREATE_PERSONA');
+  const [name, setName] = useState('');
   const [persona, setPersona] = useState('');
   const [prompt, setPrompt] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -91,6 +92,10 @@ function App() {
    * @returns void
    */
   const handleCreateBot = () => {
+    if (name.trim() === '') {
+      setStatusMessage({ type: 'error', message: 'Bot name cannot be empty.' });
+      return;
+    }
     if (persona.trim() === '') {
       setStatusMessage({ type: 'error', message: 'Persona cannot be empty.' });
       return;
@@ -98,7 +103,7 @@ function App() {
     // Add the new bot to the bots list
     setBots(prev => [
       ...prev,
-      { persona: persona.trim(), createdAt: Date.now() }
+      { name: name.trim(), persona: persona.trim(), createdAt: Date.now() }
     ]);
     setStatusMessage({ type: 'success', message: 'Bot successfully created!' });
     setStep('PERSONA_CREATED');
@@ -108,8 +113,9 @@ function App() {
    * handleStartChatting - Transitions to the chatting step.
    * @returns void
    */
-  const handleStartChatting = (persona: string): void => {
+  const handleStartChatting = (persona: string, name: string): void => {
     setPersona(persona);
+    setName(name);
     setStep('CHATTING');
     setStatusMessage(null); // Clear the "Bot created" message
   };
@@ -120,6 +126,7 @@ function App() {
    */
   const handleCreateNewBot = () => {
     setStep('CREATE_PERSONA');
+    setName('');
     setPersona('');
     setMessages([]);
     setPrompt('');
@@ -141,11 +148,12 @@ function App() {
             {bots.map((bot) => (
               <li key={bot.createdAt} className="flex items-center gap-2 text-sm justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium">{bot.persona}</span>
+                  <span className="font-bold">{bot.name}</span>
+                  <span className="text-gray-600">- {bot.persona}</span>
                   <span className="text-gray-400">({new Date(bot.createdAt).toLocaleString()})</span>
                 </div>
                 <button
-                  onClick={() => handleStartChatting(bot.persona)}
+                  onClick={() => handleStartChatting(bot.persona, bot.name)}
                   className="px-3 py-1 rounded bg-[#646cff] text-white text-xs font-semibold hover:bg-[#535bf2] transition-colors cursor-pointer">
                   Start Chatting
                 </button>
@@ -157,10 +165,14 @@ function App() {
 
       {step === 'CREATE_PERSONA' && (
         <div className="flex flex-col gap-4">
-          <Persona value={persona} onChange={e => setPersona(e.target.value)} />
+          <Persona
+            name={name}
+            onNameChange={e => setName(e.target.value)}
+            value={persona}
+            onChange={e => setPersona(e.target.value)} />
           <button
             onClick={handleCreateBot}
-            disabled={!persona.trim()}
+            disabled={!name.trim() || !persona.trim()}
             className="py-2.5 rounded-md bg-[#646cff] text-white font-semibold text-base cursor-pointer border-none hover:bg-[#535bf2] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
             Create Bot
           </button>
