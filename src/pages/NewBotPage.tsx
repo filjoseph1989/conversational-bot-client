@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import type { AppContextType } from '../App';
 import type { Bot, StatusMessage } from '../types/index';
+import Persona from '../components/Persona';
 
 function NewBotPage() {
   const navigate = useNavigate();
@@ -47,28 +48,12 @@ function NewBotPage() {
       )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div>
-          <label htmlFor="name" className="block font-medium mb-1"> Name </label>
-          <input
-            id="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            placeholder="e.g., Socrates"
-            required />
-        </div>
-        <div>
-          <label htmlFor="persona" className="block font-medium mb-1"> Role </label>
-          <textarea
-            id="persona"
-            value={persona}
-            onChange={(e) => setPersona(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md resize-y"
-            rows={4}
-            placeholder="Describe the bot's personality and role..."
-            required />
-        </div>
+        <Persona
+          name={name}
+          value={persona}
+          onNameChange={(e) => setName(e.target.value)}
+          onChange={(e) => setPersona(e.target.value)}
+        />
         <button
           type="submit"
           className="py-2.5 rounded-md bg-[#646cff] text-white font-semibold text-base cursor-pointer border-none hover:bg-[#535bf2] transition-colors" >
